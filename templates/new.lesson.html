@@ -1,0 +1,13 @@
+{{ define "content" }}
+
+<form role="form" action="/lesson/create" method="component">
+  <div class="lead">Create a new lesson with the following topic</div>
+  <div class="form-group">
+    <textarea class="form-control" name="topic" id="topic" placeholder="Lesson topic here" rows="4"></textarea>
+    <br/>
+    <br/>
+    <button class="btn btn-lg btn-primary pull-right" type="submit">Create this lesson</button>
+  </div>
+</form>
+
+{{ end }}

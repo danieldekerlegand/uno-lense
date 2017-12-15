@@ -1,12 +1,24 @@
 {{ define "content" }}
 
-<form role="form" action="/lesson/create" method="component">
-  <div class="lead">Create a new lesson with the following topic</div>
+<form role="form" action="/lesson/create" method="POST">
   <div class="form-group">
-    <textarea class="form-control" name="topic" id="topic" placeholder="Lesson topic here" rows="4"></textarea>
+		<div class="lead">Lesson topic:</div>
+    <input type="text" class="form-control" name="topic" id="topic" placeholder="Lesson topic here" rows="4"></input>
+		<br/>
+		<br/>
+		<div class="lead">Detailed instructions:</div>
+		<textarea class="form-control" name="details" id="details" placeholder="Detailed instructions here" rows="4"></textarea>
+		<br/>
+		<br/>
+		<div class="lead">Choose a base image for the lesson</div>
+		<select class="form-control" name="image" id="image" placeholder="Select an image">
+			{{ range . }}
+				<option value="{{.ID}}">{{.RepoTags}}</option>
+			{{ end }}
+		</select>
     <br/>
     <br/>
-    <button class="btn btn-lg btn-primary pull-right" type="submit">Create this lesson</button>
+    <button class="btn btn-lg btn-primary pull-right" type="submit">Create</button>
   </div>
 </form>
 

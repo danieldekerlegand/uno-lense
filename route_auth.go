@@ -1,7 +1,7 @@
 package main
 
 import (
-	"lense/data"
+	"uno-lense/data"
 	"net/http"
 )
 
@@ -30,6 +30,7 @@ func signupAccount(writer http.ResponseWriter, request *http.Request) {
 		Email:    request.PostFormValue("email"),
 		Password: request.PostFormValue("password"),
 	}
+
 	if err := user.Create(); err != nil {
 		danger(err, "Cannot create user")
 	}
@@ -44,6 +45,7 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		danger(err, "Cannot find user")
 	}
+
 	if user.Password == data.Encrypt(request.PostFormValue("password")) {
 		session, err := user.CreateSession()
 		if err != nil {

@@ -2,14 +2,20 @@ package data
 
 import (
 	"time"
+
+	"fmt"
+	"github.com/docker/docker/api/types"
 )
 
 type Lesson struct {
 	Id        int
 	Uuid      string
 	Topic     string
+	Details		string
+	Published int
 	UserId    int
 	CreatedAt time.Time
+	BaseImage string
 }
 
 type Component struct {
@@ -63,15 +69,30 @@ func (lesson *Lesson) Components() (components []Component, err error) {
 }
 
 // Create a new lesson
-func (user *User) CreateLesson(topic string) (conv Lesson, err error) {
-	statement := "insert into lessons (uuid, topic, user_id, created_at) values ($1, $2, $3, $4) returning id, uuid, topic, user_id, created_at"
+func (user *User) CreateLesson(topic string, base_image string, details string) (conv Lesson, err error) {
+	statement := "insert into lessons (uuid, topic, user_id, created_at, base_image, details, published) values ($1, $2, $3, $4, $5, $6, 0)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	// use QueryRow to return a row and scan the returned id into the Session struct
-	err = stmt.QueryRow(createUUID(), topic, user.Id, time.Now()).Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt)
+	// // use QueryRow to return a row and scan the returned id into the Session struct
+	// err = stmt.QueryRow(createUUID(), topic, user.Id, time.Now()).Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt)
+	// return
+
+	uuid := createUUID()
+	// execute the insert
+	_, err = stmt.Exec(uuid, topic, user.Id, time.Now(), base_image, details)
+
+	// scan the new into the Session struct
+	statement = "SELECT id, uuid, topic, user_id, created_at, base_image, details, published FROM lessons WHERE uuid = $1"
+	stmt, err = Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt, &conv.BaseImage, &conv.Published)
 	return
 }
 
@@ -90,13 +111,14 @@ func (user *User) CreateComponent(conv Lesson, body string) (component Component
 
 // Get all lessons in the database and returns it
 func Lessons() (lessons []Lesson, err error) {
-	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM lessons ORDER BY created_at DESC")
+	fmt.Println("in Lessons()")
+	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at, base_image, details, published FROM lessons ORDER BY created_at DESC")
 	if err != nil {
 		return
 	}
 	for rows.Next() {
 		conv := Lesson{}
-		if err = rows.Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt); err != nil {
+		if err = rows.Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt, &conv.BaseImage, &conv.Details, &conv.Published); err != nil {
 			return
 		}
 		lessons = append(lessons, conv)
@@ -108,8 +130,8 @@ func Lessons() (lessons []Lesson, err error) {
 // Get a lesson by the UUID
 func LessonByUUID(uuid string) (conv Lesson, err error) {
 	conv = Lesson{}
-	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM lessons WHERE uuid = $1", uuid).
-		Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt)
+	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at, base_image, details, published FROM lessons WHERE uuid = $1", uuid).
+		Scan(&conv.Id, &conv.Uuid, &conv.Topic, &conv.UserId, &conv.CreatedAt, &conv.BaseImage, &conv.Details, &conv.Published)
 	return
 }
 
@@ -127,4 +149,30 @@ func (component *Component) User() (user User) {
 	Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = $1", component.UserId).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
 	return
+}
+
+func Images() (images []types.ImageSummary) {
+	pullImage()
+	// listRemoteImages()
+	return listLocalImages()
+}
+
+func PublishLesson(uuid string) {
+	statement := "UPDATE lessons SET published = 1 WHERE uuid = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(uuid)
+}
+
+func UnpublishLesson(uuid string) {
+	statement := "UPDATE lessons SET published = 0 WHERE uuid = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(uuid)
 }

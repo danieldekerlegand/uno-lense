@@ -2,7 +2,7 @@ package data
 
 import (
 	"time"
-	"fmt"
+	// "fmt"
 )
 
 type User struct {
@@ -24,22 +24,31 @@ type Session struct {
 
 // Create a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
-	fmt.Println("CreateSession()");
-	fmt.Println(user);
-	statement := "insert into sessions (uuid, email, user_id, created_at) values ($1, $2, $3, $4) returning id, uuid, email, user_id, created_at"
+	statement := "insert into sessions (uuid, email, user_id, created_at) values ($1, $2, $3, $4)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	// use QueryRow to return a row and scan the returned id into the Session struct
-	err = stmt.QueryRow(createUUID(), user.Email, user.Id, time.Now()).Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
+
+	uuid := createUUID()
+	// execute the insert
+	_, err = stmt.Exec(uuid, user.Email, user.Id, time.Now())
+
+	// scan the new into the Session struct
+	statement = "SELECT id, uuid, email, user_id, created_at FROM sessions WHERE uuid = $1"
+	stmt, err = Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
 	return
 }
 
 // Get the session for an existing user
 func (user *User) Session() (session Session, err error) {
-	fmt.Println("Session()");
 	session = Session{}
 	err = Db.QueryRow("SELECT id, uuid, email, user_id, created_at FROM sessions WHERE user_id = $1", user.Id).
 		Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
@@ -48,7 +57,6 @@ func (user *User) Session() (session Session, err error) {
 
 // Check if session is valid in the database
 func (session *Session) Check() (valid bool, err error) {
-	fmt.Println("Check()");
 	err = Db.QueryRow("SELECT id, uuid, email, user_id, created_at FROM sessions WHERE uuid = $1", session.Uuid).
 		Scan(&session.Id, &session.Uuid, &session.Email, &session.UserId, &session.CreatedAt)
 	if err != nil {
@@ -63,7 +71,6 @@ func (session *Session) Check() (valid bool, err error) {
 
 // Delete session from database
 func (session *Session) DeleteByUUID() (err error) {
-	fmt.Println("DeleteByUUID()");
 	statement := "delete from sessions where uuid = $1"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -77,8 +84,6 @@ func (session *Session) DeleteByUUID() (err error) {
 
 // Get the user from the session
 func (session *Session) User() (user User, err error) {
-	fmt.Println("User()");
-	fmt.Println(session.UserId);
 	user = User{}
 	err = Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = $1", session.UserId).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
@@ -94,9 +99,6 @@ func SessionDeleteAll() (err error) {
 
 // Create a new user, save user info into the database
 func (user *User) Create() (err error) {
-	// Componentgres does not automatically return the last insert id, because it would be wrong to assume
-	// you're always using a sequence.You need to use the RETURNING keyword in your insert to get this
-	// information from componentgres.
 	statement := "insert into users (uuid, name, email, password, created_at) values ($1, $2, $3, $4, $5)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -104,12 +106,7 @@ func (user *User) Create() (err error) {
 	}
 	defer stmt.Close()
 
-	fmt.Println("inserted user")
-
 	newUUID := createUUID()
-	fmt.Println("newUUID " + newUUID)
-
-
 	stmt.Exec(newUUID, user.Name, user.Email, Encrypt(user.Password), time.Now())
 
 	stmt, err = Db.Prepare("select id, uuid, created_at from users where uuid=?")
@@ -170,7 +167,6 @@ func Users() (users []User, err error) {
 
 // Get a single user given the email
 func UserByEmail(email string) (user User, err error) {
-	fmt.Println("UserByEmail()");
 	user = User{}
 	err = Db.QueryRow("SELECT id, uuid, name, email, password, created_at FROM users WHERE email = $1", email).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Password, &user.CreatedAt)

@@ -35,6 +35,8 @@ func main() {
 	mux.HandleFunc("/lesson/create", createLesson)
 	mux.HandleFunc("/lesson/component", componentLesson)
 	mux.HandleFunc("/lesson/read", readLesson)
+	mux.HandleFunc("/lesson/publish", publishLesson)
+	mux.HandleFunc("/lesson/unpublish", unpublishLesson)
 
 	// starting up the server
 	server := &http.Server{

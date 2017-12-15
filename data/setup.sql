@@ -18,7 +18,10 @@ create table sessions (
 create table lessons (
   id         integer primary key,
   uuid       varchar(64) not null unique,
-  topic      text,
+	topic 		 text,
+  details    text,
+	base_image varchar(255),
+	published  integer,
   user_id    integer references users(id),
   created_at timestamp not null
 );

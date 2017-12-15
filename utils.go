@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"lense/data"
+	"uno-lense/data"
 	"html/template"
 	"log"
 	"net/http"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"lense/data"
+	"uno-lense/data"
 	"net/http"
 )
 

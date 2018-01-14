@@ -1,161 +1,91 @@
 package data
 
 import (
-	"io"
-	"os"
 	"fmt"
-	// "net/http"
-	// "net"
-	// "time"
-
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
-
-	_ "github.com/joho/godotenv/autoload"
+	"os/exec"
 )
 
-func listLocalImages() (images []types.ImageSummary) {
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, nil)
-	// cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	images, err = cli.ImageList(context.Background(), types.ImageListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
+func RunLocalImage() (out []byte, err error) {
+	cmdStr := "docker start hello-world"
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 	return
 }
 
-func listRemoteImages() (images []types.ImageSummary) {
-	// var headers map[string]string
-
-	// tr := &http.Transport{}
-
-	// tr.Dial = func(proto, addr string) (net.Conn, error) {
-	// 	fmt.Println("Dial called")
-	// 	conn, err := net.DialTimeout(proto, addr, time.Minute)
-	// 	if err != nil {
-	// 			fmt.Println("There was  an err", err)
-	// 	}
-	// 	return conn, err
-	// }
-
-	// cl := &http.Client{Transport: tr}
-
-	// cli, err := client.NewEnvClient("https://0.0.0.0:5000", "v1.22", nil, nil)
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	images, err = cli.ImageList(context.Background(), types.ImageListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	for _, image := range images {
-		fmt.Printf("%+v \n", image)
-	}
-
+func ListRunningContainers() (out []byte, err error) {
+	cmdStr := "curl --unix-socket /var/run/docker.sock http:/containers/json"
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 	return
 }
 
-func listRunningContainers() {
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, nil)
-	// cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	for _, container := range containers {
-		fmt.Printf("%+v \n", container)
-	}
+func ListImages() (out []byte, err error) {
+	cmdStr := "curl --unix-socket /var/run/docker.sock http:/images/json"
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	return
 }
 
-func pullImage() {
-	ctx := context.Background()
-	//cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, nil)
-
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	out, err := cli.ImagePull(ctx, "lesson4-comp1", types.ImagePullOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	defer out.Close()
-
-	io.Copy(os.Stdout, out)
+func ListRemoteImages(repo string, username string, password string) (out []byte, err error) {
+	cmdStr := "curl -X GET https://" + username + ":" + password + "@" + repo + "/v2/_catalog"
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	return
 }
 
-func pushImage() {
-	ctx := context.Background()
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, nil)
-	// cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
+func PullImage(name string) (out []byte, err error) {
+	cmdStr := "docker tag " + name + " registry.cs.uno.edu/" + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 
-	out, err := cli.ImagePush(ctx, "alpine", types.ImagePushOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	defer out.Close()
-
-	io.Copy(os.Stdout, out)
+	cmdStr = "docker pull registry.cs.uno.edu/" + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	return
 }
 
-func runContainer() {
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
+func PushImage(name string) (out []byte, err error) {
+	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 
-	_, err = cli.ImagePull(ctx, "docker.io/library/alpine", types.ImagePullOptions{})
-	if err != nil {
-		panic(err)
-	}
+	cmdStr = "docker tag " + name + " registry.cs.uno.edu/" + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: "alpine",
-		Cmd:   []string{"echo", "hello world"},
-	}, nil, nil, "")
-	if err != nil {
-		panic(err)
-	}
+	cmdStr = "docker push registry.cs.uno.edu/" + name
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	fmt.Printf("%s", err)
+	return
+}
 
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		panic(err)
-	}
+func startRemoteImage(ip string, name string) (out []byte, err error) {
+	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 
-	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
-		if err != nil {
-			panic(err)
-		}
-	case <-statusCh:
-	}
+	cmdStr = "docker tag " + name + " registry.cs.uno.edu/" + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
 
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
-	if err != nil {
-		panic(err)
-	}
+	cmdStr = "docker push registry.cs.uno.edu/" + name
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	fmt.Printf("%s", err)
+	return
+}
 
-	io.Copy(os.Stdout, out)
+func stopRemoteImage(ip string, name string) (out []byte, err error) {
+	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+
+	cmdStr = "docker tag " + name + " registry.cs.uno.edu/" + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+
+	cmdStr = "docker push registry.cs.uno.edu/" + name
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	fmt.Printf("%s", err)
+	return
 }

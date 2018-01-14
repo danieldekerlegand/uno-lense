@@ -6,25 +6,21 @@ import (
 	"net/http"
 )
 
-// GET /lessons/new
+// GET /lesson/new
 // Show the new lesson form page
 func newLesson(writer http.ResponseWriter, request *http.Request) {
-	// listImages()
-	// listRunningContainers()
-	images := data.Images()
-	fmt.Printf("images: %+v \n", images)
 	_, err := session(writer, request)
 	if err != nil {
 		http.Redirect(writer, request, "/login", 302)
 	} else {
-		generateHTML(writer, images, "layout", "private.navbar", "new.lesson")
+		generateHTML(writer, nil, "layout", "private.navbar", "new.lesson")
 	}
 }
 
-// POST /signup
-// Create the user account
+// POST /lesson/new
+// Create a new lesson
 func createLesson(writer http.ResponseWriter, request *http.Request) {
-	sess, err := session(writer, request)
+	_, err := session(writer, request)
 	if err != nil {
 		http.Redirect(writer, request, "/login", 302)
 	} else {
@@ -32,17 +28,19 @@ func createLesson(writer http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			danger(err, "Cannot parse form")
 		}
-		user, err := sess.User()
-		if err != nil {
-			danger(err, "Cannot get user from session")
-		}
-		topic := request.PostFormValue("topic")
+		// user, err := sess.User()
+		// if err != nil {
+		// 	danger(err, "Cannot get user from session")
+		// }
 		base_image := request.PostFormValue("image")
-		details := request.PostFormValue("details")
-		fmt.Println("base_image " + base_image)
-		if _, err := user.CreateLesson(topic, base_image, details); err != nil {
-			danger(err, "Cannot create lesson")
-		}
+		data.PushImage(base_image)
+		// topic := request.PostFormValue("topic")
+		// base_image := request.PostFormValue("image")
+		// details := request.PostFormValue("details")
+		// fmt.Println("base_image " + base_image)
+		// if _, err := user.CreateLesson(topic, base_image, details); err != nil {
+		// 	danger(err, "Cannot create lesson")
+		// }
 		http.Redirect(writer, request, "/", 302)
 	}
 }
@@ -108,4 +106,116 @@ func componentLesson(writer http.ResponseWriter, request *http.Request) {
 		url := fmt.Sprint("/lesson/read?id=", uuid)
 		http.Redirect(writer, request, url, 302)
 	}
+}
+
+// POST /local/images
+func localImages(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/", 302)
+	} else {
+		var images []byte
+		images, err = data.ListImages()
+
+		writer.Header().Set("Content-Type", "application/json")
+		writer.Write(images)
+	}
+}
+
+// GET /repository
+func repository(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/", 302)
+	} else {
+		generateHTML(writer, nil, "layout", "private.navbar", "repository")
+	}
+}
+
+// POST /repository/images
+func repositoryImages(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/", 302)
+	} else {
+		err = request.ParseForm()
+		if err != nil {
+			danger(err, "Cannot parse form")
+		}
+		repo := request.PostFormValue("repo")
+		username := request.PostFormValue("username")
+		password := request.PostFormValue("password")
+
+		var images []byte
+		images, err = data.ListRemoteImages(repo, username, password)
+
+		writer.Header().Set("Content-Type", "application/json")
+		writer.Write(images)
+	}
+}
+
+// POST
+func repositoryPush(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/login", 302)
+	} else {
+		err = request.ParseForm()
+		if err != nil {
+			danger(err, "Cannot parse form")
+		}
+		repo := request.PostFormValue("image")
+		data.PushImage(repo)
+
+		http.Redirect(writer, request, "repository", 302)
+	}
+}
+
+// POST
+func repositoryPull(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/login", 302)
+	} else {
+		err = request.ParseForm()
+		if err != nil {
+			danger(err, "Cannot parse form")
+		}
+		repo := request.PostFormValue("image")
+		data.PullImage(repo)
+
+		http.Redirect(writer, request, "repository", 302)
+	}
+}
+
+// POST
+// /connect
+func connect(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+	ip := request.RemoteAddr
+	name := request.PostFormValue("name")
+	s_id := request.PostFormValue("s_id")
+
+	fmt.Println("ip", ip)
+	fmt.Println("name", name)
+	fmt.Println("s_id", s_id)
+}
+
+// POST
+// /disconnect
+func disconnect(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+	ip := request.RemoteAddr
+	name := request.PostFormValue("name")
+	s_id := request.PostFormValue("s_id")
+
+	fmt.Println("ip", ip)
+	fmt.Println("name", name)
+	fmt.Println("s_id", s_id)
 }

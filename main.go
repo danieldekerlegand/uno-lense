@@ -38,6 +38,16 @@ func main() {
 	mux.HandleFunc("/lesson/publish", publishLesson)
 	mux.HandleFunc("/lesson/unpublish", unpublishLesson)
 
+	mux.HandleFunc("/local/images", localImages)
+
+	mux.HandleFunc("/repository", repository)
+	mux.HandleFunc("/repository/images", repositoryImages)
+	mux.HandleFunc("/repository/push", repositoryPush)
+	mux.HandleFunc("/repository/pull", repositoryPull)
+
+	mux.HandleFunc("/connect", connect)
+	mux.HandleFunc("/disconnect", disconnect)
+
 	// starting up the server
 	server := &http.Server{
 		Addr:           config.Address,

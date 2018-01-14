@@ -1,6 +1,10 @@
 {{ define "content" }}
 
-<form role="form" action="/lesson/create" method="POST">
+<h5>Choose A Repository</h5>
+<input type="text" id="repository-name" placeholder="Input repo name..."/>
+<button id="choose-repo">Submit</button>
+
+<form id="create-repo" method="POST" action="/lesson/create" class="hidden">
   <div class="form-group">
 		<div class="lead">Lesson topic:</div>
     <input type="text" class="form-control" name="topic" id="topic" placeholder="Lesson topic here" rows="4"></input>
@@ -11,11 +15,7 @@
 		<br/>
 		<br/>
 		<div class="lead">Choose a base image for the lesson</div>
-		<select class="form-control" name="image" id="image" placeholder="Select an image">
-			{{ range . }}
-				<option value="{{.ID}}">{{.RepoTags}}</option>
-			{{ end }}
-		</select>
+		<select class="form-control" name="image" id="image" placeholder="Select an image"></select>
     <br/>
     <br/>
     <button class="btn btn-lg btn-primary pull-right" type="submit">Create</button>

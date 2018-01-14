@@ -2,9 +2,7 @@ package data
 
 import (
 	"time"
-
 	"fmt"
-	"github.com/docker/docker/api/types"
 )
 
 type Lesson struct {
@@ -149,12 +147,6 @@ func (component *Component) User() (user User) {
 	Db.QueryRow("SELECT id, uuid, name, email, created_at FROM users WHERE id = $1", component.UserId).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.CreatedAt)
 	return
-}
-
-func Images() (images []types.ImageSummary) {
-	pullImage()
-	// listRemoteImages()
-	return listLocalImages()
 }
 
 func PublishLesson(uuid string) {

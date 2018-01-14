@@ -45,6 +45,7 @@ func main() {
 	mux.HandleFunc("/repository/push", repositoryPush)
 	mux.HandleFunc("/repository/pull", repositoryPull)
 
+	mux.HandleFunc("/settings", settings)
 	mux.HandleFunc("/connect", connect)
 	mux.HandleFunc("/disconnect", disconnect)
 

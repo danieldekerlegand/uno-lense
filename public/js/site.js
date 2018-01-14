@@ -64,7 +64,11 @@ $('#connect-to-server').click(function() {
   var serverIP = $('#server-ip').val();
   $.ajax({
     type: "POST",
-    url: serverIP + '/connect'
+    url: serverIP + '/connect',
+    data: {
+      name: $('#connect-to-server input[name="name"]').val(),
+      s_id: $('#connect-to-server input[name="s_id"]').val()
+    }
   })
   .done(function(res) {
     console.log(res)

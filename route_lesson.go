@@ -188,6 +188,18 @@ func repositoryPull(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// GET /settings
+// Show the settings page
+func settings(writer http.ResponseWriter, request *http.Request) {
+	_, err := session(writer, request)
+	if err != nil {
+		http.Redirect(writer, request, "/login", 302)
+	} else {
+		fmt.Println("in settings")
+		generateHTML(writer, nil, "layout", "private.navbar", "settings")
+	}
+}
+
 // POST
 // /connect
 func connect(writer http.ResponseWriter, request *http.Request) {

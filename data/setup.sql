@@ -7,6 +7,14 @@ create table users (
   created_at timestamp not null
 );
 
+create table remote_connections (
+  id         integer primary key,
+  uuid       varchar(64) not null unique,
+  ip         varchar(64) not null,
+  name       varchar(255),
+  connected  integer
+);
+
 create table sessions (
   id         integer primary key,
   uuid       varchar(64) not null unique,

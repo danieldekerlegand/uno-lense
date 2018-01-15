@@ -214,6 +214,8 @@ func connect(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("ip", ip)
 	fmt.Println("name", name)
 	fmt.Println("s_id", s_id)
+
+	data.AddRemoteConnection(s_id, ip, name)
 }
 
 // POST
@@ -230,4 +232,6 @@ func disconnect(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("ip", ip)
 	fmt.Println("name", name)
 	fmt.Println("s_id", s_id)
+
+	data.RemoveRemoteConnection(s_id)
 }

@@ -38,7 +38,8 @@ $('#search-repo').submit(function(e) {
   });
 });
 
-$('#choose-repo').click(function() {
+$('#choose-repo').click(function(e) {
+  console.log("#choose-repo")
   repo = $('#repository-name').val();
   $.ajax({
     type: "GET",
@@ -60,11 +61,14 @@ $('#choose-repo').click(function() {
   });
 });
 
-$('#connect-to-server').click(function() {
-  var serverIP = $('#server-ip').val();
+$('#connect-to-server').submit(function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var endpoint = 'http://' + $('#server-ip').val() + ':8080/connect';
+  console.log(endpoint)
   $.ajax({
     type: "POST",
-    url: serverIP + '/connect',
+    url: endpoint,
     data: {
       name: $('#connect-to-server input[name="name"]').val(),
       s_id: $('#connect-to-server input[name="s_id"]').val()

@@ -22,6 +22,14 @@ type Session struct {
 	CreatedAt time.Time
 }
 
+type RemoteConnection struct {
+	Id        int
+	Uuid      string
+	IP				string
+	Name			string
+	Connected int
+}
+
 // Create a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
 	statement := "insert into sessions (uuid, email, user_id, created_at) values ($1, $2, $3, $4)"
@@ -162,6 +170,30 @@ func Users() (users []User, err error) {
 		users = append(users, user)
 	}
 	rows.Close()
+	return
+}
+
+func AddRemoteConnection(id string, IP string, name string) {
+	statement := "insert into remote_connections (uuid, ip, name, connected) values ($1, $2, $3, $4)"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	stmt.Exec(id, ip, name, 1)
+	return
+}
+
+func RemoveRemoteConnection(id string) {
+	statement := "delete from remote_connections where uuid = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
 	return
 }
 

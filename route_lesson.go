@@ -203,6 +203,9 @@ func settings(writer http.ResponseWriter, request *http.Request) {
 // POST
 // /connect
 func connect(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+
 	err := request.ParseForm()
 	if err != nil {
 		danger(err, "Cannot parse form")
@@ -214,6 +217,8 @@ func connect(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("ip", ip)
 	fmt.Println("name", name)
 	fmt.Println("s_id", s_id)
+
+	writer.Write([]byte("connected"))
 }
 
 // POST

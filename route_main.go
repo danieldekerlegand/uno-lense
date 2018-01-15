@@ -18,15 +18,26 @@ func err(writer http.ResponseWriter, request *http.Request) {
 }
 
 func index(writer http.ResponseWriter, request *http.Request) {
-	lessons, err := data.Lessons()
+	rcs, err := data.RemoteConnections()
 	if err != nil {
-		error_message(writer, request, "Cannot get lessons")
+		error_message(writer, request, "Cannot get remote connections")
 	} else {
 		_, err := session(writer, request)
 		if err != nil {
-			generateHTML(writer, lessons, "layout", "public.navbar", "index")
+			generateHTML(writer, nil, "layout", "public.navbar", "index")
 		} else {
-			generateHTML(writer, lessons, "layout", "private.navbar", "index")
+			generateHTML(writer, rcs, "layout", "private.navbar", "index")
 		}
 	}
+	// lessons, err := data.Lessons()
+	// if err != nil {
+	// 	error_message(writer, request, "Cannot get lessons")
+	// } else {
+	// 	_, err := session(writer, request)
+	// 	if err != nil {
+	// 		generateHTML(writer, lessons, "layout", "public.navbar", "index")
+	// 	} else {
+	// 		generateHTML(writer, lessons, "layout", "private.navbar", "index")
+	// 	}
+	// }
 }

@@ -197,6 +197,23 @@ func RemoveRemoteConnection(id string) {
 	return
 }
 
+// Get all remote connections in the database and returns them
+func RemoteConnections() (rcs []RemoteConnection, err error) {
+	rows, err := Db.Query("SELECT id, uuid, ip, name, connected FROM remote_connections")
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		rc := RemoteConnection{}
+		if err = rows.Scan(&rc.Id, &rc.Uuid, &rc.IP, &rc.Name, &rc.Connected); err != nil {
+			return
+		}
+		rcs = append(rcs, rc)
+	}
+	rows.Close()
+	return
+}
+
 // Get a single user given the email
 func UserByEmail(email string) (user User, err error) {
 	user = User{}

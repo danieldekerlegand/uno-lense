@@ -6,30 +6,58 @@ import (
 )
 
 func StopLocalContainer(name string) (out []byte, err error) {
+	fmt.Println("stop local container " + name)
 	cmdStr := "docker stop " + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s", out)
+	}
+
 	return
 }
 
 func PauseLocalContainer(name string) (out []byte, err error) {
+	fmt.Println("pause local container " + name)
 	cmdStr := "docker pause " + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s", out)
+	}
+
 	return
 }
 
 func StartLocalContainer(name string) (out []byte, err error) {
+	fmt.Println("start local container " + name)
 	cmdStr := "docker start " + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s", out)
+	}
+
 	return
 }
 
 func RestartLocalContainer(name string) (out []byte, err error) {
+	fmt.Println("restart local container " + name)
 	cmdStr := "docker restart " + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s", out)
+	}
+
 	return
 }
 

@@ -82,16 +82,17 @@ $('#connect-to-server').submit(function(e) {
   });
 });
 
-var studentIPs = [""];
+var studentIPs = ["172.16.38.139"];
 
 function controlContainer(cmd) {
   studentIPs.forEach(function(ip) {
     var endpoint = 'http://' + ip + ":8080" + cmd;
+    console.log('endpoint', endpoint)
     $.ajax({
       type: "POST",
       url: endpoint,
       data: {
-        name: "hello-world"
+        name: "lesson4-comp1"
       }
     })
     .done(function(res) {
@@ -104,6 +105,7 @@ function controlContainer(cmd) {
 }
 
 $('#stop-remote-container').click(function() {
+  console.log("test")
   controlContainer("/container/stop")
 });
 

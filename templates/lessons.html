@@ -1,0 +1,14 @@
+{{ range . }}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <span class="lead"> <i class="fa fa-eye"></i> {{ .Name }}</span>
+    </div>
+    <div class="panel-body">
+      Student ID: {{ .Uuid }} IP: {{ .IP }}
+			 <!-- - {{ .NumReplies }} components. -->
+      <div class="pull-right">
+        <a href="/lesson/read?id={{.Uuid }}">Details</a>
+      </div>
+    </div>
+  </div>
+{{ end }}

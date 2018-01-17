@@ -5,12 +5,40 @@ import (
 	"os/exec"
 )
 
-func RunLocalImage() (out []byte, err error) {
-	cmdStr := "docker start hello-world"
+func StopLocalContainer(name string) (out []byte, err error) {
+	cmdStr := "docker stop " + name
 	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	fmt.Printf("%s", out)
 	return
 }
+
+func PauseLocalContainer(name string) (out []byte, err error) {
+	cmdStr := "docker pause " + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	return
+}
+
+func StartLocalContainer(name string) (out []byte, err error) {
+	cmdStr := "docker start " + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	return
+}
+
+func RestartLocalContainer(name string) (out []byte, err error) {
+	cmdStr := "docker restart " + name
+	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	return
+}
+
+// func DownloadLocalContainer(name string) (out []byte, err error) {
+// 	cmdStr := "docker restart " + name
+// 	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
+// 	fmt.Printf("%s", out)
+// 	return
+// }
 
 func ListRunningContainers() (out []byte, err error) {
 	cmdStr := "curl --unix-socket /var/run/docker.sock http:/containers/json"
@@ -43,38 +71,6 @@ func PullImage(name string) (out []byte, err error) {
 }
 
 func PushImage(name string) (out []byte, err error) {
-	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
-	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-
-	cmdStr = "docker tag " + name + " registry.cs.uno.edu/" + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-
-	cmdStr = "docker push registry.cs.uno.edu/" + name
-	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-	fmt.Printf("%s", err)
-	return
-}
-
-func startRemoteImage(ip string, name string) (out []byte, err error) {
-	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
-	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-
-	cmdStr = "docker tag " + name + " registry.cs.uno.edu/" + name
-	out, _ = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-
-	cmdStr = "docker push registry.cs.uno.edu/" + name
-	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
-	fmt.Printf("%s", out)
-	fmt.Printf("%s", err)
-	return
-}
-
-func stopRemoteImage(ip string, name string) (out []byte, err error) {
 	cmdStr := "docker login -u daniel -p pass https://registry.cs.uno.edu"
 	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	fmt.Printf("%s", out)

@@ -181,7 +181,7 @@ func AddRemoteConnection(id string, IP string, name string) {
 	}
 	defer stmt.Close()
 
-	stmt.Exec(id, ip, name, 1)
+	stmt.Exec(id, IP, name, 1)
 	return
 }
 

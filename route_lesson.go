@@ -20,7 +20,7 @@ func newLesson(writer http.ResponseWriter, request *http.Request) {
 // POST /lesson/new
 // Create a new lesson
 func createLesson(writer http.ResponseWriter, request *http.Request) {
-	_, err := session(writer, request)
+	session, err := session(writer, request)
 	if err != nil {
 		http.Redirect(writer, request, "/login", 302)
 	} else {
@@ -28,19 +28,20 @@ func createLesson(writer http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			danger(err, "Cannot parse form")
 		}
-		// user, err := sess.User()
-		// if err != nil {
-		// 	danger(err, "Cannot get user from session")
-		// }
+		user, err := session.User()
+		if err != nil {
+			danger(err, "Cannot get user from session")
+		}
 		base_image := request.PostFormValue("image")
 		data.PushImage(base_image)
-		// topic := request.PostFormValue("topic")
-		// base_image := request.PostFormValue("image")
-		// details := request.PostFormValue("details")
-		// fmt.Println("base_image " + base_image)
-		// if _, err := user.CreateLesson(topic, base_image, details); err != nil {
-		// 	danger(err, "Cannot create lesson")
-		// }
+
+		topic := request.PostFormValue("topic")
+		details := request.PostFormValue("details")
+
+		fmt.Println("base_image " + base_image)
+		if _, err := user.CreateLesson(topic, base_image, details); err != nil {
+			danger(err, "Cannot create lesson")
+		}
 		http.Redirect(writer, request, "/", 302)
 	}
 }
@@ -238,4 +239,99 @@ func disconnect(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("s_id", s_id)
 
 	data.RemoveRemoteConnection(s_id)
+}
+
+func containerStop(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+
+	name := request.PostFormValue("name")
+
+	res, runErr := data.StopLocalContainer(name)
+	if runErr != nil {
+		danger(err, "docker error")
+	} else {
+		writer.Write(res)
+	}
+}
+
+func containerPause(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+
+	name := request.PostFormValue("name")
+
+	res, runErr := data.PauseLocalContainer(name)
+	if runErr != nil {
+		danger(err, "docker error")
+	} else {
+		writer.Write(res)
+	}
+}
+
+func containerStart(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+
+	name := request.PostFormValue("name")
+
+	res, runErr := data.StartLocalContainer(name)
+	if runErr != nil {
+		danger(err, "docker error")
+	} else {
+		writer.Write(res)
+	}
+}
+
+func containerRestart(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+
+	name := request.PostFormValue("name")
+
+	res, runErr := data.RestartLocalContainer(name)
+	if runErr != nil {
+		danger(err, "docker error")
+	} else {
+		writer.Write(res)
+	}
+}
+
+func containerDownload(writer http.ResponseWriter, request *http.Request) {
+	// writer.Header().Set("Content-Type", "application/json")
+	// writer.Header().Set("Access-Control-Allow-Origin", "*")
+  //
+	// err := request.ParseForm()
+	// if err != nil {
+	// 	danger(err, "Cannot parse form")
+	// }
+	// ip := request.RemoteAddr
+	// name := request.PostFormValue("name")
+  //
+	// res, runErr := data.DownloadLocalContainer(name)
+	// if runErr != nil {
+	// 	writer.Write(runErr)
+	// } else {
+	// 	writer.Write(res)
+	// }
 }

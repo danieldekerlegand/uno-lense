@@ -1,21 +1,42 @@
 {{ define "content" }}
-<p class="lead">
-  <a href="/lesson/new">Create a lesson</a> or view one below
-</p>
 
-{{ range . }}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <span class="lead"> <i class="fa fa-eye"></i> {{ .Topic }}</span>
-    </div>
-    <div class="panel-body">
-      Created by {{ .User.Name }} - {{ .CreatedAtDate }}
-			 <!-- - {{ .NumReplies }} components. -->
-      <div class="pull-right">
-        <a href="/lesson/read?id={{.Uuid }}">Details</a>
-      </div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="lead"> <i class="fa fa-eye"></i> Lesson</span>
+  </div>
+  <div class="panel-body">
+    <i id="stop-remote-container" class="fa fa-stop fa-3x" aria-hidden="true"></i>
+    <i id="pause-remote-container" class="fa fa-pause fa-3x" aria-hidden="true"></i>
+    <i id="start-remote-container" class="fa fa-play fa-3x" aria-hidden="true"></i>
+    <i id="restart-remote-container" class="fa fa-backward fa-3x" aria-hidden="true"></i>
+    <i id="download-remote-container" class="fa fa-download fa-3x" aria-hidden="true"></i>
+    <div class="pull-right">
+      <a href="/lesson/read?id">Details</a>
     </div>
   </div>
-{{ end }}
+</div>
+
+<table id="student-table" class="table">
+  <thead>
+    <tr>
+      <th scope="col">Select</th>
+      <th scope="col">Name</th>
+      <th scope="col">Student ID</th>
+      <th scope="col">IP</th>
+      <th scope="col">Lesson Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range . }}
+      <tr class="student">
+        <td><input type="checkbox" value="{{.IP}}"></td>
+        <td>{{ .Name }}</td>
+        <td>{{ .Uuid }}</td>
+        <td> {{ .IP }}</td>
+        <td>Foo</td>
+      </tr>
+    {{ end }}
+  </tbody>
+</table>
 
 {{ end }}

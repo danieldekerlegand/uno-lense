@@ -13,14 +13,7 @@ func main() {
 	files := http.FileServer(http.Dir(config.Static))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	//
-	// all route patterns matched here
-	// route handler functions defined in other files
-	//
-
-	// index
 	mux.HandleFunc("/", index)
-	// error
 	mux.HandleFunc("/err", err)
 
 	// defined in route_auth.go
@@ -48,6 +41,12 @@ func main() {
 	mux.HandleFunc("/settings", settings)
 	mux.HandleFunc("/connect", connect)
 	mux.HandleFunc("/disconnect", disconnect)
+
+	mux.HandleFunc("/container/stop", containerStop);
+	mux.HandleFunc("/container/pause", containerPause);
+	mux.HandleFunc("/container/start", containerStart);
+	mux.HandleFunc("/container/restart", containerRestart);
+	mux.HandleFunc("/container/download", containerDownload);
 
 	// starting up the server
 	server := &http.Server{

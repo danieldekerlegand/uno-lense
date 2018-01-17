@@ -82,10 +82,43 @@ $('#connect-to-server').submit(function(e) {
   });
 });
 
-$('#start-remote-repo').click(function() {
+var studentIPs = [""];
 
+function controlContainer(cmd) {
+  studentIPs.forEach(function(ip) {
+    var endpoint = 'http://' + ip + ":8080" + cmd;
+    $.ajax({
+      type: "POST",
+      url: endpoint,
+      data: {
+        name: "hello-world"
+      }
+    })
+    .done(function(res) {
+      console.log(res)
+    })
+    .error(function(err) {
+      console.log(err);
+    });
+  });
+}
+
+$('#stop-remote-container').click(function() {
+  controlContainer("/container/stop")
 });
 
-$('#stop-remote-repo').click(function() {
+$('#pause-remote-container').click(function() {
+  controlContainer("/container/pause");
+});
 
+$('#start-remote-container').click(function() {
+  controlContainer("/container/start");
+});
+
+$('#restart-remote-container').click(function() {
+  controlContainer("/container/restart");
+});
+
+$('#download-remote-container').click(function() {
+  controlContainer("/container/download");
 });

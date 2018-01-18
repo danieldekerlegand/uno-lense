@@ -84,6 +84,8 @@ func ListImages() (out []byte, err error) {
 func ListRemoteImages(repo string, username string, password string) (out []byte, err error) {
 	cmdStr := "curl -X GET https://" + username + ":" + password + "@" + repo + "/v2/_catalog"
 	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	fmt.Printf("%s", out)
+	fmt.Printf("%s", err)
 	return
 }
 

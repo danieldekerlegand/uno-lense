@@ -1,8 +1,15 @@
 {{ define "content" }}
 
+<form>
+  <select class="form-control" id="image-select"></select>
+</form>
+
+<br/>
+<br/>
+
 <div class="panel panel-default">
   <div class="panel-heading">
-    <span class="lead"> <i class="fa fa-eye"></i> Lesson</span>
+    <div class="lead"> <i class="fa fa-eye"></i> <span id="lesson-name">Lesson</span></div>
   </div>
   <div class="panel-body">
     <i id="stop-remote-container" class="fa fa-stop fa-3x" aria-hidden="true"></i>
@@ -11,7 +18,8 @@
     <i id="restart-remote-container" class="fa fa-backward fa-3x" aria-hidden="true"></i>
     <i id="download-remote-container" class="fa fa-download fa-3x" aria-hidden="true"></i>
     <div class="pull-right">
-      <a href="/lesson/read?id">Details</a>
+      
+      <!-- <a href="/lesson/read?id">Details</a> -->
     </div>
   </div>
 </div>

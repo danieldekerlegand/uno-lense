@@ -82,7 +82,7 @@ $('#connect-to-server').submit(function(e) {
   });
 });
 
-var studentIPs = ["172.16.38.139"];
+var studentIPs = new Set();
 
 function controlContainer(cmd) {
   studentIPs.forEach(function(ip) {
@@ -104,6 +104,16 @@ function controlContainer(cmd) {
   });
 }
 
+$('.student input[type="checkbox"]').change(function(e) {
+  var uri = e.currentTarget.value;
+  if (studentIPs.has(uri)) {
+    studentIPs.delete(uri);
+  } else {
+    studentIPs.add(uri);
+  }
+  console.log(studentIPs);
+});
+
 $('#stop-remote-container').click(function() {
   console.log("test")
   controlContainer("/container/stop")
@@ -123,4 +133,36 @@ $('#restart-remote-container').click(function() {
 
 $('#download-remote-container').click(function() {
   controlContainer("/container/download");
+});
+
+var currentImages;
+
+function getLocalImages() {
+  $.ajax({
+    type: "GET",
+    url: "/local/images"
+  })
+  .done(function(images) {
+    if (Array.isArray(images)) {
+      currentImages = images;
+
+      images.forEach(function(image) {
+        var option = $('<option value="' + image.RepoTags[0] + '">' + image.RepoTags[0] + '</option>');
+        $('#image-select').append(option);
+      });
+
+      $('#image-select').removeClass('hidden');
+
+      $('#image-select').change(function(e) {
+        $('#lesson-name').text(e.currentTarget.value);
+      });
+    }
+  })
+  .error(function(err) {
+    console.log(err);
+  });
+}
+
+$(document).ready(function() {
+  getLocalImages();
 });

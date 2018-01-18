@@ -219,6 +219,9 @@ func connect(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("name", name)
 	fmt.Println("s_id", s_id)
 
+	// remove any old connections for student id
+	data.RemoveRemoteConnection(s_id)
+
 	data.AddRemoteConnection(s_id, ip, name)
 	writer.Write([]byte("connected"))
 }

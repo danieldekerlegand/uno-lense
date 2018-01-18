@@ -105,7 +105,7 @@ function controlContainer(cmd) {
 }
 
 $('.student input[type="checkbox"]').change(function(e) {
-  var uri = e.currentTarget.value;
+  var uri = e.currentTarget.value.split(":")[0];
   if (studentIPs.has(uri)) {
     studentIPs.delete(uri);
   } else {
